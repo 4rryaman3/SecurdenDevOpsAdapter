@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Text;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace SecurdenApiProtocol
 {
@@ -62,12 +63,33 @@ namespace SecurdenApiProtocol
         [JsonExtensionData]
         public Dictionary<string, JsonElement>? AccountsData { get; set; }
     }
-
-    public class SecurdenApiAdapter : IDisposable       
+    public class accountPassword
     {
-   
+        [JsonPropertyName("password")]
+        public string? Password { get; set; }
+
+        [JsonPropertyName("label")]
+        public string? Label { get; set; }
+
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement>? additionalData { get; set; }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append("{");
+            if (!string.IsNullOrEmpty(Label)) sb.Append($"\"password_label\": \"{Label}\",");
+            if (sb[sb.Length - 1] == ',')
+                sb.Length--;
+            sb.Append("}");
+            return sb.ToString();
+        }
+    }
+    public class SecurdenApiAdapter : IDisposable
+    {
+
         private readonly BaseApiClient _baseClient;
-        public readonly List<string> fields = ["account_id", "account_name", "account_title", "account_type", "ticket_id","reason"];
+        public readonly List<string> fields = ["account_id", "account_name", "account_title", "account_type", "account_category", "domain_account_name", "ticket_id", "reason"];
         public SecurdenApiAdapter(string baseUrl, string authToken)
         {
             _baseClient = new BaseApiClient(baseUrl, authToken);
@@ -86,7 +108,7 @@ namespace SecurdenApiProtocol
             var returnObj = _baseClient.GetAsync<AccountDto>("/secretsmanagement/get_account", filteredParams);
             return returnObj;
         }
-        public List<AccountDto> GetAccounts(List<string>? accountIdsList=null, List<Dictionary<string, string>>? accountParams=null)
+        public List<AccountDto> GetAccounts(List<string>? accountIdsList = null, List<Dictionary<string, string>>? accountParams = null)
         {
             var returnObj = new List<AccountDto>();
 
@@ -126,11 +148,23 @@ namespace SecurdenApiProtocol
 
             return returnObj;
         }
+        public accountPassword? GetAccountPassword(List<KeyValuePair<string, string>>? accountParams = null)
+        {
+            var returnObj = new accountPassword();
+            if (accountParams == null)
+            {
+                return returnObj;
+            }
+            var filteredParams = accountParams
+                .Where(kvp => fields.Contains(kvp.Key))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            returnObj = _baseClient.GetAsync<accountPassword>("/secretsmanagement/get_password_via_tools", filteredParams);
+            return returnObj;
+        }
         public void Dispose()
         {
             _baseClient.Dispose();
         }
-
-     
     }
 }

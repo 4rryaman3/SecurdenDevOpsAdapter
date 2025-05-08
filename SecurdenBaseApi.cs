@@ -73,7 +73,6 @@ namespace SecurdenApiProtocol
 
             return JsonSerializer.Deserialize<T>(json);
         }
-        
         public void Dispose()
         {
             _disposed = true;
