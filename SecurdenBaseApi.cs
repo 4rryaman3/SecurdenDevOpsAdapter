@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Collections.Generic;
 
 namespace SecurdenApiProtocol
 {
@@ -52,7 +53,7 @@ namespace SecurdenApiProtocol
             }
 
             var response = _httpClient.GetAsync(endpoint).GetAwaiter().GetResult();
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
 
             var json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             return JsonSerializer.Deserialize<T>(json);
@@ -64,7 +65,7 @@ namespace SecurdenApiProtocol
             .PostAsync(endpoint, content)
             .GetAwaiter()
             .GetResult();
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
 
             var json = response.Content
              .ReadAsStringAsync()

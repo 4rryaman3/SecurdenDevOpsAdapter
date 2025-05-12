@@ -52,7 +52,7 @@ namespace SecurdenApiProtocol
         }
 
     }
-    public class GetAccountsResponse
+    public class ApiResponse
     {
         [JsonPropertyName("status_code")]
         public int? StatusCode { get; set; }
@@ -61,7 +61,20 @@ namespace SecurdenApiProtocol
         public string? Message { get; set; }
 
         [JsonExtensionData]
-        public Dictionary<string, JsonElement>? AccountsData { get; set; }
+        public Dictionary<string, JsonElement>? AdditionalResponse { get; set; }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append("{");
+
+            if (StatusCode != null) sb.Append($"\"StatusCode\": {StatusCode},");
+            if (!string.IsNullOrEmpty(Message)) sb.Append($"\"Message\": \"{Message}\",");
+            if (sb[sb.Length - 1] == ',')
+                sb.Length--;
+            sb.Append("}");
+            return sb.ToString();
+        }
     }
     public class accountPassword
     {
@@ -89,7 +102,7 @@ namespace SecurdenApiProtocol
     {
 
         private readonly BaseApiClient _baseClient;
-        public readonly List<string> fields = ["account_id", "account_name", "account_title", "account_type", "account_category", "domain_account_name", "ticket_id", "reason"];
+        public readonly List<string> fields = ["account_id", "account_name", "account_title", "account_type", "account_category", "domain_account_name", "ticket_id", "reason", "new_password", "is_remote"];
         public SecurdenApiAdapter(string baseUrl, string authToken)
         {
             _baseClient = new BaseApiClient(baseUrl, authToken);
@@ -134,11 +147,11 @@ namespace SecurdenApiProtocol
                     new("accounts", accountsJson)
                 };
 
-            var accountResponse = _baseClient.PostFormdata<GetAccountsResponse>("/secretsmanagement/get_accounts", formData);
+            var accountResponse = _baseClient.PostFormdata<ApiResponse>("/secretsmanagement/get_accounts", formData);
 
-            if (accountResponse?.AccountsData != null)
+            if (accountResponse?.AdditionalResponse != null)
             {
-                foreach (var kvp in accountResponse.AccountsData)
+                foreach (var kvp in accountResponse.AdditionalResponse)
                 {
                     var dto = kvp.Value.Deserialize<AccountDto>();
                     if (dto != null)
@@ -160,6 +173,19 @@ namespace SecurdenApiProtocol
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             returnObj = _baseClient.GetAsync<accountPassword>("/secretsmanagement/get_password_via_tools", filteredParams);
+            return returnObj;
+        }
+        public ApiResponse? ChangePassword(List<KeyValuePair<string, string>>? accountParams = null) {
+            var returnObj = new ApiResponse();
+            if (accountParams == null)
+            {
+                return returnObj;
+            }
+            var filteredParams = accountParams
+                .Where(kvp => fields.Contains(kvp.Key))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            returnObj = _baseClient.PostFormdata<ApiResponse>("/secretsmanagement/change_remote_password", filteredParams);
             return returnObj;
         }
         public void Dispose()
