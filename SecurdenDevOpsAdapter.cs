@@ -103,9 +103,9 @@ namespace SecurdenApiProtocol
 
         private readonly BaseApiClient _baseClient;
         public readonly List<string> fields = ["account_id", "account_name", "account_title", "account_type", "account_category", "domain_account_name", "ticket_id", "reason", "new_password", "is_remote"];
-        public SecurdenApiAdapter(string baseUrl, string authToken)
+        public SecurdenApiAdapter(string baseUrl, string authToken, string? clientCertificatePath, string? clientCertificatePassword = null,bool allowSelfSignedServerCertificate = false)
         {
-            _baseClient = new BaseApiClient(baseUrl, authToken);
+            _baseClient = new BaseApiClient(baseUrl, authToken,clientCertificatePath,clientCertificatePassword, allowSelfSignedServerCertificate);
         }
         public AccountDto? GetSpecificAccount(List<KeyValuePair<string, string>>? accountParams = null)
         {
