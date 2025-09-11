@@ -1,9 +1,56 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- Target(s) -->
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+
+    <!-- NuGet package metadata -->
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Securden.ApiProtocol</PackageId>
+    <Version>1.0.0</Version> <!-- or pass /p:PackageVersion=1.0.0 -->
+    <Authors>Securden</Authors>
+    <Company>Securden</Company>
+    <Description>.NET client for Securden integeration.</Description>
+    <PackageTags>security;pam;securden;api;client</PackageTags>
+    <RepositoryUrl>https://github.com/4rryaman3/SecurdenDevOpsAdapter</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/you/repo</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression> <!-- or use PackageLicenseFile -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+    <!-- Symbols & XML docs -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Reproducible builds & SourceLink -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+
+    <!-- Assembly metadata (optional) -->
+    <AssemblyName>SecurdenApiProtocol</AssemblyName>
+    <RootNamespace>SecurdenApiProtocol</RootNamespace>
+
+    <!-- Where to drop nupkgs (optional) -->
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\nupkgs</PackageOutputPath>
   </PropertyGroup>
+
+  <!-- Include README and icon in the package root if they exist -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('README.md')" />
+    <None Include="icon.png"  Pack="true" PackagePath="\" Condition="Exists('icon.png')" />
+  </ItemGroup>
+
+  <!-- SourceLink for GitHub (adjust for Azure DevOps/GitLab) -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
 
 </Project>
