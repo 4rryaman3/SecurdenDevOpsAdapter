@@ -125,9 +125,11 @@ namespace SecurdenApiProtocol
         {
             var returnObj = new List<AccountDto>();
 
-            if (accountIdsList == null || accountIdsList.Count == 0)
+            if ((accountIdsList == null || accountIdsList.Count == 0) && (accountParams==null))
                 return returnObj;
-
+            if (accountIdsList == null) {
+                accountIdsList = [];
+            }
             var accountIdParams = "[" + string.Join(",", accountIdsList) + "]";
 
             var filteredParamsList = new List<Dictionary<string, string>>();
