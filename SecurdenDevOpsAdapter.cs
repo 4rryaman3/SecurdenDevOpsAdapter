@@ -184,8 +184,12 @@ namespace SecurdenApiProtocol
             var filteredParams = accountParams
                 .Where(kvp => fields.Contains(kvp.Key))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-            returnObj = _baseClient.PostFormdata<ApiResponse>("/secretsmanagement/change_remote_password", filteredParams);
+            
+            var url = "/secretsmanagement/change_password";
+            if (filteredParams.ContainsKey("is_remote")) {
+                url = "/secretsmanagement/change_remote_password";
+            }
+            returnObj = _baseClient.PostFormdata<ApiResponse>(url, filteredParams);
             return returnObj;
         }
         public void Dispose()
